@@ -88,3 +88,12 @@ And check the test coverage using the following command:
 ```bash
 $ go tool cover -func=coverage.out
 ```
+
+## Comments
+
+- The Orchestrator is still a very important piece for making everything to work together. Ideally the components should be a bit more independent and communicate directly, perhaps it is a great opportunity for an Actor Model.
+- The individual components are only refered mainly by interfaces, making it possible to replace them with different implementations in future.
+- Components like the Frontier, Events, and Storage have a "memory" implementation, but they would be the first candidates for having other implementations, like a distributed queue or a storage capable or persisting data in disk for instance.
+- The application entry delegated to the Cobra command is a bit messy and deserves refactoring.
+- The Frontier interface is quite poor, it only allows popping jobs (URLs) using a non buffered channel.
+- Some responsibilities were delegated to the wrong components. For instance, Events is responsible for "determining" if a URL should be downloadded by informing if it was ever discovered.
