@@ -9,7 +9,7 @@ import (
 
 func assertEventInMemoryEvents(
 	t *testing.T,
-	me *memory.MemoryEvents,
+	me *memory.Events,
 	address string,
 	eventType events.EventType,
 	success bool,
@@ -37,7 +37,7 @@ func assertEventInMemoryEvents(
 }
 
 func TestMemoryEvents_LogDiscoveryEvent(t *testing.T) {
-	me := memory.NewMemoryEvents()
+	me := memory.NewEvents()
 	me.LogDiscoveryEvent("url1", true)
 	me.LogDiscoveryEvent("url1", true)
 	me.LogDiscoveryEvent("url2", true)
@@ -54,7 +54,7 @@ func TestMemoryEvents_LogDiscoveryEvent(t *testing.T) {
 }
 
 func TestMemoryEvents_LogDownloadEvent(t *testing.T) {
-	me := memory.NewMemoryEvents()
+	me := memory.NewEvents()
 	me.LogDownloadEvent("url1", true)
 	me.LogDownloadEvent("url1", true)
 	me.LogDownloadEvent("url2", true)
@@ -71,7 +71,7 @@ func TestMemoryEvents_LogDownloadEvent(t *testing.T) {
 }
 
 func TestMemoryEvents_LogParseEvent(t *testing.T) {
-	me := memory.NewMemoryEvents()
+	me := memory.NewEvents()
 	me.LogParseEvent("url1", true, 10)
 	me.LogParseEvent("url1", true, 10)
 	me.LogParseEvent("url2", true, 10)
@@ -88,7 +88,7 @@ func TestMemoryEvents_LogParseEvent(t *testing.T) {
 }
 
 func TestMemoryEvents_LogStoreEvent(t *testing.T) {
-	me := memory.NewMemoryEvents()
+	me := memory.NewEvents()
 	me.LogStoreEvent("url1", true)
 	me.LogStoreEvent("url1", true)
 	me.LogStoreEvent("url2", true)
@@ -105,7 +105,7 @@ func TestMemoryEvents_LogStoreEvent(t *testing.T) {
 }
 
 func TestMemoryEvents_LogDispatchEvent(t *testing.T) {
-	me := memory.NewMemoryEvents()
+	me := memory.NewEvents()
 	me.LogDispatchEvent("url1", true, 5)
 	me.LogDispatchEvent("url1", true, 5)
 	me.LogDispatchEvent("url2", true, 5)
@@ -122,7 +122,7 @@ func TestMemoryEvents_LogDispatchEvent(t *testing.T) {
 }
 
 func TestMemoryEvents_GetReport(t *testing.T) {
-	me := memory.NewMemoryEvents()
+	me := memory.NewEvents()
 	me.LogDiscoveryEvent("url1", true)
 	me.LogDownloadEvent("url1", true)
 	me.LogParseEvent("url1", true, 10)
@@ -136,8 +136,8 @@ func TestMemoryEvents_GetReport(t *testing.T) {
 	assertEventInMemoryEvents(t, me, "url1", events.Dispatch, true, 5, 1)
 }
 
-func TestMemoryEvents_ShouldDownload(t *testing.T) {
-	me := memory.NewMemoryEvents()
+func TestMemoryEvents_IsAlreadyDiscovered(t *testing.T) {
+	me := memory.NewEvents()
 	me.LogDownloadEvent("url1", true)
 	me.LogParseEvent("url1", true, 10)
 	me.LogStoreEvent("url1", true)
@@ -145,38 +145,38 @@ func TestMemoryEvents_ShouldDownload(t *testing.T) {
 	me.LogDiscoveryEvent("url2", true)
 
 	type testCase struct {
-		testName               string
-		me                     *memory.MemoryEvents
-		url                    string
-		expectedShouldDOwnload bool
+		testName                    string
+		me                          *memory.Events
+		url                         string
+		expectedIsAlreadyDiscovered bool
 	}
 
 	testCases := []testCase{
 		{
-			testName:               "should_download_when_unknown",
-			me:                     me,
-			url:                    "new-url",
-			expectedShouldDOwnload: true,
+			testName:                    "should_download_when_unknown",
+			me:                          me,
+			url:                         "new-url",
+			expectedIsAlreadyDiscovered: true,
 		},
 		{
-			testName:               "should_download_when_not_discovered",
-			me:                     me,
-			url:                    "url1",
-			expectedShouldDOwnload: true,
+			testName:                    "should_download_when_not_discovered",
+			me:                          me,
+			url:                         "url1",
+			expectedIsAlreadyDiscovered: true,
 		},
 		{
-			testName:               "should_not_download_when_discovered",
-			me:                     me,
-			url:                    "url2",
-			expectedShouldDOwnload: false,
+			testName:                    "should_not_download_when_discovered",
+			me:                          me,
+			url:                         "url2",
+			expectedIsAlreadyDiscovered: false,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.testName, func(t *testing.T) {
-			actualShouldDownload := tc.me.ShouldDownload(tc.url)
-			if tc.expectedShouldDOwnload != actualShouldDownload {
-				t.Errorf("expected %v, got %v", tc.expectedShouldDOwnload, actualShouldDownload)
+			actualIsAlreadyDiscovered := tc.me.IsAlreadyDiscovered(tc.url)
+			if tc.expectedIsAlreadyDiscovered != actualIsAlreadyDiscovered {
+				t.Errorf("expected %v, got %v", tc.expectedIsAlreadyDiscovered, actualIsAlreadyDiscovered)
 			}
 		})
 	}

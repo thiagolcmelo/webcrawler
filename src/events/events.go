@@ -5,13 +5,19 @@ import (
 	"time"
 )
 
+// EventType is an enumeration for defining types of events
 type EventType int
 
 const (
+	// Discovery is used for a URL that was discovered
 	Discovery EventType = iota
+	// Download is used for a URL that was downloade
 	Download
+	// Parse is used for a URL that was parsed
 	Parse
+	// Store is used for a URL that was stored
 	Store
+	// Dispatch is used for a URL that was dispatched
 	Dispatch
 )
 
@@ -32,6 +38,7 @@ func (et EventType) String() string {
 	}
 }
 
+// EventInstance bundles information about an event
 type EventInstance struct {
 	EventType EventType
 	Success   bool
@@ -39,6 +46,7 @@ type EventInstance struct {
 	Time      time.Time
 }
 
+// Events defines an interface for a storage used for logging events
 type Events interface {
 	LogDiscoveryEvent(string, bool)
 	LogDownloadEvent(string, bool)
@@ -46,5 +54,5 @@ type Events interface {
 	LogStoreEvent(string, bool)
 	LogDispatchEvent(string, bool, int)
 	GetReport() map[string][]EventInstance
-	ShouldDownload(string) bool
+	IsAlreadyDiscovered(string) bool
 }

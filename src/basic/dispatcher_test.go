@@ -36,7 +36,7 @@ func (fe *fakeEvents) LogDispatchEvent(string, bool, int) {}
 func (fe *fakeEvents) GetReport() map[string][]events.EventInstance {
 	return map[string][]events.EventInstance{}
 }
-func (fe *fakeEvents) ShouldDownload(url string) bool {
+func (fe *fakeEvents) IsAlreadyDiscovered(url string) bool {
 	_, ok := fe.UrlsToDownload[url]
 	return ok
 }
@@ -90,7 +90,7 @@ func TestBasicDispatcher_DispatchNewUrls(t *testing.T) {
 				}
 			}
 
-			dispatcher := basic.NewBasicDispatcher(fe, ff)
+			dispatcher := basic.NewDispatcher(fe, ff)
 			_, err := dispatcher.DispatchNewUrls(maps.Keys(tc.shouldDownload))
 			if !errors.Is(err, tc.expectedErr) {
 				t.Errorf("expected %v, got %v", tc.expectedErr, err)

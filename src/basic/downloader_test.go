@@ -97,7 +97,7 @@ func TestDownloader_Download(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			downloader := basic.NewBasicDownloader(1, time.Second, 2)
+			downloader := basic.NewDownloader(1, time.Second, 2)
 
 			err = downloader.Download(context.Background(), &c)
 			if !errors.Is(err, tc.expectedErr) {
@@ -165,7 +165,7 @@ func TestDownloader_Retries(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			downloader := basic.NewBasicDownloader(tc.retries, 200*time.Millisecond, 2)
+			downloader := basic.NewDownloader(tc.retries, 200*time.Millisecond, 2)
 
 			err = downloader.Download(context.Background(), &c)
 			if err != nil && attempts >= tc.successRequest {
@@ -236,7 +236,7 @@ func TestDownloader_Backoff(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			downloader := basic.NewBasicDownloader(tc.retries, 200*time.Millisecond, 2)
+			downloader := basic.NewDownloader(tc.retries, 200*time.Millisecond, 2)
 
 			err = downloader.Download(context.Background(), &c)
 			if err != nil && attempts >= tc.successRequest {

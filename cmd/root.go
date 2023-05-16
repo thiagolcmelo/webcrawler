@@ -1,6 +1,4 @@
-/*
-Copyright © 2023 Luiz Melo
-*/
+// Package cmd contains the COBRA CLI app used as entry for the webcrawler tool
 package cmd
 
 import (

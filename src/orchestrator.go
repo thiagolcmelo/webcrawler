@@ -20,12 +20,14 @@ import (
 	"github.com/thiagolcmelo/webcrawler/src/storage"
 )
 
+// OrchestratorOutputItem bundles the necessary information for exporting the result
 type OrchestratorOutputItem struct {
-	Url         string   `json:"url"`
+	URL         string   `json:"url"`
 	ContentType string   `json:"contentType"`
 	Children    []string `json:"children"`
 }
 
+// Orchestrator glues together all components
 type Orchestrator struct {
 	ctx         context.Context
 	wg          sync.WaitGroup
@@ -38,6 +40,7 @@ type Orchestrator struct {
 	dispatcher  dispatcher.Dispatcher
 }
 
+// NewOrchestrator creates a new Orchestrator
 func NewOrchestrator(
 	ctx context.Context,
 	downloaders int,
@@ -55,26 +58,27 @@ func NewOrchestrator(
 		frontier:    frontier,
 		storage:     storage,
 		events:      events,
-		downloader:  basic.NewBasicDownloader(retries, backoff, backoffMultiplier),
-		parser:      basic.NewBasicParser(),
-		dispatcher:  basic.NewBasicDispatcher(events, frontier),
+		downloader:  basic.NewDownloader(retries, backoff, backoffMultiplier),
+		parser:      basic.NewParser(),
+		dispatcher:  basic.NewDispatcher(events, frontier),
 	}
 }
 
+// Start synchronously explore the domain
 func (o *Orchestrator) Start(seed string) {
 	for i := 0; i < o.downloaders; i++ {
 		go func(i int) {
 			for {
 				select {
 				case url := <-o.frontier.Consume():
-					go o.processUrl(url)
+					go o.processURL(url)
 				case <-o.ctx.Done():
 					return
 				}
 			}
 		}(i)
 	}
-	// wg is decremented when processUrl finishes
+	// wg is decremented when processURL finishes
 	o.wg.Add(1)
 	o.frontier.Publish(seed)
 
@@ -95,15 +99,15 @@ func (o *Orchestrator) Start(seed string) {
 func (o *Orchestrator) discovery(c *content.Content) error {
 	if c.Scheme == "" {
 		o.wg.Add(1)
-		go o.processUrl(fmt.Sprintf("https://%s", c.Address))
+		go o.processURL(fmt.Sprintf("https://%s", c.Address))
 		o.wg.Add(1)
-		go o.processUrl(fmt.Sprintf("http://%s", c.Address))
+		go o.processURL(fmt.Sprintf("http://%s", c.Address))
 
 		o.events.LogDiscoveryEvent(c.Address, false)
 		return fmt.Errorf("url missing schema [%s], trying https and http", c.Address)
 	}
 
-	if !o.events.ShouldDownload(c.Address) {
+	if !o.events.IsAlreadyDiscovered(c.Address) {
 		o.events.LogDiscoveryEvent(c.Address, false)
 		return fmt.Errorf("repeated url [%s]", c.Address)
 	}
@@ -156,12 +160,12 @@ func (o *Orchestrator) dispatch(c *content.Content) error {
 		return fmt.Errorf("dispatch failed: %v", err)
 	}
 	o.events.LogDispatchEvent(c.Address, true, n)
-	// wg is decremented when processUrl finishes
+	// wg is decremented when processURL finishes
 	o.wg.Add(n)
 	return nil
 }
 
-func (o *Orchestrator) processUrl(url string) {
+func (o *Orchestrator) processURL(url string) {
 	// wg is incremented upon adding seed and after dispatching
 	defer o.wg.Done()
 
@@ -190,20 +194,21 @@ func (o *Orchestrator) processUrl(url string) {
 	}
 }
 
-func (o *Orchestrator) PrintReport(w io.Writer, isJson bool, isIndented bool) error {
+// PrintReport writes the result to the provided writer in the specified format
+func (o *Orchestrator) PrintReport(w io.Writer, isJSON bool, isIndented bool) error {
 	allContent := o.storage.GetAllContent()
 	sort.Sort(sortByAddress(allContent))
 
 	output := make([]OrchestratorOutputItem, len(allContent))
 	for i, c := range allContent {
 		output[i] = OrchestratorOutputItem{
-			Url:         c.Address,
+			URL:         c.Address,
 			ContentType: c.ContentType,
 			Children:    c.GetChildrenList(),
 		}
 	}
 
-	if isJson {
+	if isJSON {
 		var jsonData []byte
 		var err error
 		if isIndented {

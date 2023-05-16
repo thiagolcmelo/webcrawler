@@ -5,23 +5,26 @@ import (
 	"github.com/thiagolcmelo/webcrawler/src/frontier"
 )
 
-type BasicDispatcher struct {
+// Dispatcher is a basic implementation for Dispatcher interface
+type Dispatcher struct {
 	events   events.Events
 	frontier frontier.Frontier
 }
 
-func NewBasicDispatcher(events events.Events, frontier frontier.Frontier) *BasicDispatcher {
-	return &BasicDispatcher{
+// NewDispatcher creates a new dispatcher
+func NewDispatcher(events events.Events, frontier frontier.Frontier) *Dispatcher {
+	return &Dispatcher{
 		events:   events,
 		frontier: frontier,
 	}
 }
 
-func (bd *BasicDispatcher) DispatchNewUrls(urls []string) (int, error) {
+// DispatchNewUrls dispatches new URLs to the download frontier
+func (bd *Dispatcher) DispatchNewUrls(urls []string) (int, error) {
 	newUrls := []string{}
 
 	for _, url := range urls {
-		if bd.events.ShouldDownload(url) {
+		if bd.events.IsAlreadyDiscovered(url) {
 			newUrls = append(newUrls, url)
 		}
 	}

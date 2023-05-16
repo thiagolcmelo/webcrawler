@@ -9,32 +9,39 @@ import (
 )
 
 var (
-	ErrAddingDuplicateUrl     = errors.New("could not add content because url exists already")
+	// ErrAddingDuplicateURL should be used when trying to add a reapeated url
+	ErrAddingDuplicateURL = errors.New("could not add content because url exists already")
+	// ErrAddingDuplicateContent should be used when trying to add reapeated content
 	ErrAddingDuplicateContent = errors.New("could not add content because it exists already")
+	// ErrUpdatingUnknownContent should be used when trying to update unknown content
 	ErrUpdatingUnknownContent = errors.New("could not update content because it does not exist yet")
-	ErrGettingUnknownContent  = errors.New("could not get content because it does not exist yet")
+	// ErrGettingUnknownContent should be used when trying to get unknown content
+	ErrGettingUnknownContent = errors.New("could not get content because it does not exist yet")
 )
 
-type MemoryStorage struct {
+// Storage is an in memory implementation of Storage
+type Storage struct {
 	existingChecksums map[[32]byte]struct{}
 	urlToChecksum     map[string][32]byte
 	cache             map[string]content.Content
 	sync.RWMutex
 }
 
-func NewMemoryStorage() *MemoryStorage {
-	return &MemoryStorage{
+// NewStorage is a factory for in memory Storage
+func NewStorage() *Storage {
+	return &Storage{
 		existingChecksums: map[[32]byte]struct{}{},
 		urlToChecksum:     map[string][32]byte{},
 		cache:             map[string]content.Content{},
 	}
 }
 
-func (ms *MemoryStorage) Add(c content.Content) error {
+// Add adds a new content to storage
+func (ms *Storage) Add(c content.Content) error {
 	ms.Lock()
 	defer ms.Unlock()
 	if _, ok := ms.cache[c.Address]; ok {
-		return ErrAddingDuplicateUrl
+		return ErrAddingDuplicateURL
 	}
 	if _, ok := ms.existingChecksums[c.BodyHash]; ok {
 		return ErrAddingDuplicateContent
@@ -45,7 +52,8 @@ func (ms *MemoryStorage) Add(c content.Content) error {
 	return nil
 }
 
-func (ms *MemoryStorage) UpdateContent(c content.Content) error {
+// UpdateContent updates an existing content
+func (ms *Storage) UpdateContent(c content.Content) error {
 	ms.Lock()
 	defer ms.Unlock()
 	if _, ok := ms.cache[c.Address]; !ok {
@@ -55,7 +63,8 @@ func (ms *MemoryStorage) UpdateContent(c content.Content) error {
 	return nil
 }
 
-func (ms *MemoryStorage) GetContent(address string) (content.Content, error) {
+// GetContent retrieves a content by its address
+func (ms *Storage) GetContent(address string) (content.Content, error) {
 	ms.Lock()
 	defer ms.Unlock()
 	c, ok := ms.cache[address]
@@ -65,13 +74,15 @@ func (ms *MemoryStorage) GetContent(address string) (content.Content, error) {
 	return c, nil
 }
 
-func (ms *MemoryStorage) GetAllContent() []content.Content {
+// GetAllContent returns a list with all existing content
+func (ms *Storage) GetAllContent() []content.Content {
 	ms.Lock()
 	defer ms.Unlock()
 	return maps.Values(ms.cache)
 }
 
-func (ms *MemoryStorage) IsRepeatedContent(c content.Content) bool {
+// IsRepeatedContent checks if there is a content with the same URL or same body in memory
+func (ms *Storage) IsRepeatedContent(c content.Content) bool {
 	ms.Lock()
 	defer ms.Unlock()
 

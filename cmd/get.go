@@ -1,6 +1,4 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
+// Package cmd contains the COBRA CLI app used as entry for the webcrawler tool
 package cmd
 
 import (
@@ -53,9 +51,9 @@ The domain must be provided as a position argument.`,
 		ctx, cancel := context.WithTimeout(cmd.Context(), timeout)
 		defer cancel()
 
-		frontier := memory.NewMemoryFrontier()
-		storage := memory.NewMemoryStorage()
-		events := memory.NewMemoryEvents()
+		frontier := memory.NewFrontier()
+		storage := memory.NewStorage()
+		events := memory.NewEvents()
 
 		orchestrator := src.NewOrchestrator(
 			ctx,

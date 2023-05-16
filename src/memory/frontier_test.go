@@ -9,7 +9,7 @@ import (
 )
 
 func TestMemoryFrontier_Push(t *testing.T) {
-	mf := memory.NewMemoryFrontier()
+	mf := memory.NewFrontier()
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -31,7 +31,7 @@ func TestMemoryFrontier_Push(t *testing.T) {
 }
 
 func TestMemoryFrontier_Pop(t *testing.T) {
-	mf := memory.NewMemoryFrontier()
+	mf := memory.NewFrontier()
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 

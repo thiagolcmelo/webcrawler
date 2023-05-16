@@ -7,24 +7,27 @@ import (
 	"github.com/thiagolcmelo/webcrawler/src/events"
 )
 
-type MemoryEvents struct {
+// Events is an in memory implementation of Events
+type Events struct {
 	events map[string][]events.EventInstance
 	sync.RWMutex
 }
 
-func NewMemoryEvents() *MemoryEvents {
-	return &MemoryEvents{
+// NewEvents is a factory for in memory Events
+func NewEvents() *Events {
+	return &Events{
 		events: map[string][]events.EventInstance{},
 	}
 }
 
-func (ms *MemoryEvents) addAddressIfNeeded(address string) {
+func (ms *Events) addAddressIfNeeded(address string) {
 	if _, ok := ms.events[address]; !ok {
 		ms.events[address] = []events.EventInstance{}
 	}
 }
 
-func (ms *MemoryEvents) LogDiscoveryEvent(address string, success bool) {
+// LogDiscoveryEvent adds a Discovery event to memory
+func (ms *Events) LogDiscoveryEvent(address string, success bool) {
 	ms.Lock()
 	defer ms.Unlock()
 	ms.addAddressIfNeeded(address)
@@ -35,7 +38,8 @@ func (ms *MemoryEvents) LogDiscoveryEvent(address string, success bool) {
 	})
 }
 
-func (ms *MemoryEvents) LogDownloadEvent(address string, success bool) {
+// LogDownloadEvent adds a Download event to memory
+func (ms *Events) LogDownloadEvent(address string, success bool) {
 	ms.Lock()
 	defer ms.Unlock()
 	ms.addAddressIfNeeded(address)
@@ -46,7 +50,8 @@ func (ms *MemoryEvents) LogDownloadEvent(address string, success bool) {
 	})
 }
 
-func (ms *MemoryEvents) LogParseEvent(address string, success bool, children int) {
+// LogParseEvent adds a Parse event to memory
+func (ms *Events) LogParseEvent(address string, success bool, children int) {
 	ms.Lock()
 	defer ms.Unlock()
 	ms.addAddressIfNeeded(address)
@@ -58,7 +63,8 @@ func (ms *MemoryEvents) LogParseEvent(address string, success bool, children int
 	})
 }
 
-func (ms *MemoryEvents) LogStoreEvent(address string, success bool) {
+// LogStoreEvent adds a Store event to memory
+func (ms *Events) LogStoreEvent(address string, success bool) {
 	ms.Lock()
 	defer ms.Unlock()
 	ms.addAddressIfNeeded(address)
@@ -69,7 +75,8 @@ func (ms *MemoryEvents) LogStoreEvent(address string, success bool) {
 	})
 }
 
-func (ms *MemoryEvents) LogDispatchEvent(address string, success bool, children int) {
+// LogDispatchEvent adds a Dispatch event to memory
+func (ms *Events) LogDispatchEvent(address string, success bool, children int) {
 	ms.Lock()
 	defer ms.Unlock()
 	ms.addAddressIfNeeded(address)
@@ -81,7 +88,8 @@ func (ms *MemoryEvents) LogDispatchEvent(address string, success bool, children 
 	})
 }
 
-func (ms *MemoryEvents) ShouldDownload(address string) bool {
+// IsAlreadyDiscovered informs if an address was already discovered
+func (ms *Events) IsAlreadyDiscovered(address string) bool {
 	ms.Lock()
 	defer ms.Unlock()
 
@@ -97,7 +105,8 @@ func (ms *MemoryEvents) ShouldDownload(address string) bool {
 	return true
 }
 
-func (ms *MemoryEvents) GetReport() map[string][]events.EventInstance {
+// GetReport simply return all events
+func (ms *Events) GetReport() map[string][]events.EventInstance {
 	ms.Lock()
 	defer ms.Unlock()
 	return ms.events

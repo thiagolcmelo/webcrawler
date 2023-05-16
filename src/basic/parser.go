@@ -7,13 +7,15 @@ import (
 	"golang.org/x/net/html"
 )
 
-type BasicParser struct{}
+// Parser is a basic implementation of the Parser interface
+type Parser struct{}
 
-func NewBasicParser() *BasicParser {
-	return &BasicParser{}
+// NewParser is a factory for basic.Parser`
+func NewParser() *Parser {
+	return &Parser{}
 }
 
-func (ep BasicParser) extractLinksFromData(data []byte) ([]string, error) {
+func (ep Parser) extractLinksFromData(data []byte) ([]string, error) {
 	links := []string{}
 	reader := bytes.NewReader(data)
 	tokenizer := html.NewTokenizer(reader)
@@ -34,7 +36,8 @@ func (ep BasicParser) extractLinksFromData(data []byte) ([]string, error) {
 	}
 }
 
-func (ep *BasicParser) Parse(c *content.Content) error {
+// Parse updates a content object with the links existing in its body
+func (ep *Parser) Parse(c *content.Content) error {
 	links, err := ep.extractLinksFromData(c.Body)
 	if err != nil {
 		return err

@@ -1,20 +1,24 @@
 package memory
 
-type MemoryFrontier struct {
+// Frontier is an in memory implementation of the Frontier interface
+type Frontier struct {
 	jobs chan string
 }
 
-func NewMemoryFrontier() *MemoryFrontier {
-	return &MemoryFrontier{
+// NewFrontier is a factory for an in memory Frontier
+func NewFrontier() *Frontier {
+	return &Frontier{
 		jobs: make(chan string),
 	}
 }
 
-func (mf *MemoryFrontier) Publish(address string) error {
+// Publish adds a job/message/url to the queue
+func (mf *Frontier) Publish(address string) error {
 	mf.jobs <- address
 	return nil
 }
 
-func (mf *MemoryFrontier) Consume() <-chan string {
+// Consume returns a channel to read from the queue
+func (mf *Frontier) Consume() <-chan string {
 	return mf.jobs
 }

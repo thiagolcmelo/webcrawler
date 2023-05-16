@@ -13,25 +13,30 @@ import (
 )
 
 var (
-	ErrExecutingRequest    = errors.New("could not execute request")
+	// ErrExecutingRequest should be used when a request fails
+	ErrExecutingRequest = errors.New("could not execute request")
+	// ErrResponseStatusNotOK should be used when the status code is not ok
 	ErrResponseStatusNotOK = errors.New("response status not 200")
 )
 
-type BasicDownloader struct {
+// Downloader is a basic implementation of the Downloader interface
+type Downloader struct {
 	retries           int
 	backoff           time.Duration
 	backoffMultiplier int
 }
 
-func NewBasicDownloader(retries int, backoff time.Duration, backoffMultiplier int) *BasicDownloader {
-	return &BasicDownloader{
+// NewDownloader is a factory for basic.Downloader
+func NewDownloader(retries int, backoff time.Duration, backoffMultiplier int) *Downloader {
+	return &Downloader{
 		retries:           retries,
 		backoff:           backoff,
 		backoffMultiplier: backoffMultiplier,
 	}
 }
 
-func (bd *BasicDownloader) Download(ctx context.Context, c *content.Content) error {
+// Download attempts to fetch a URL content and store in the provided content object
+func (bd *Downloader) Download(ctx context.Context, c *content.Content) error {
 	for i := 0; i < bd.retries; i++ {
 		err := bd.download(ctx, c)
 		// if there was an error and it is not the last attempt
@@ -48,7 +53,7 @@ func (bd *BasicDownloader) Download(ctx context.Context, c *content.Content) err
 	return nil
 }
 
-func (bd *BasicDownloader) download(ctx context.Context, c *content.Content) error {
+func (bd *Downloader) download(ctx context.Context, c *content.Content) error {
 	// create a request that can be canceled from the context
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.Address, nil)
 	if err != nil {

@@ -135,9 +135,9 @@ func TestOrchestrator(t *testing.T) {
 
 	var buf bytes.Buffer
 
-	frontier := memory.NewMemoryFrontier()
-	storage := memory.NewMemoryStorage()
-	events := memory.NewMemoryEvents()
+	frontier := memory.NewFrontier()
+	storage := memory.NewStorage()
+	events := memory.NewEvents()
 
 	orchestrator := src.NewOrchestrator(ctx, 10, frontier, storage, events, 1, time.Second, 2)
 	orchestrator.Start(server.URL)
@@ -158,8 +158,8 @@ func TestOrchestrator(t *testing.T) {
 
 	less := func(a, b string) bool { return a < b }
 	for _, resultItem := range actualResult {
-		if page, ok := website[resultItem.Url]; !ok {
-			t.Errorf("unknown result %s", resultItem.Url)
+		if page, ok := website[resultItem.URL]; !ok {
+			t.Errorf("unknown result %s", resultItem.URL)
 		} else {
 			if diff := cmp.Diff(resultItem.Children, page.expectedChildren, cmpopts.SortSlices(less)); diff != "" {
 				t.Errorf("expected %#v, got %#v", page.expectedChildren, resultItem.Children)

@@ -100,7 +100,7 @@ func TestParser_Parse(t *testing.T) {
 			}
 			c.Body = []byte(tc.body)
 
-			parser := basic.NewBasicParser()
+			parser := basic.NewParser()
 
 			err = parser.Parse(&c)
 			if !errors.Is(err, tc.expectedErr) {

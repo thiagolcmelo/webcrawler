@@ -11,8 +11,8 @@ import (
 	"github.com/thiagolcmelo/webcrawler/src/memory"
 )
 
-func getMemoryStorageWithSamples(t *testing.T, samples map[string]string) *memory.MemoryStorage {
-	sampleStorage := memory.NewMemoryStorage()
+func getMemoryStorageWithSamples(t *testing.T, samples map[string]string) *memory.Storage {
+	sampleStorage := memory.NewStorage()
 
 	for url, body := range samples {
 		c, err := content.NewContentWithBody(url, []byte(body))
@@ -38,7 +38,7 @@ func TestMemoryStorage_Add(t *testing.T) {
 		testName      string
 		url           string
 		body          string
-		memoryStorage *memory.MemoryStorage
+		memoryStorage *memory.Storage
 		expectedErr   error
 	}
 
@@ -53,7 +53,7 @@ func TestMemoryStorage_Add(t *testing.T) {
 			testName:      "add_new_content_to_empty_storage_works",
 			url:           "http://new-url.com",
 			body:          "new content",
-			memoryStorage: memory.NewMemoryStorage(),
+			memoryStorage: memory.NewStorage(),
 			expectedErr:   nil,
 		},
 		{
@@ -68,7 +68,7 @@ func TestMemoryStorage_Add(t *testing.T) {
 			url:           "http://url1.com",
 			body:          "new content",
 			memoryStorage: getMemoryStorageWithSamples(t, samples),
-			expectedErr:   memory.ErrAddingDuplicateUrl,
+			expectedErr:   memory.ErrAddingDuplicateURL,
 		},
 		{
 			testName:      "add_repeated_content_fails",
@@ -112,7 +112,7 @@ func TestMemoryStorage_UpdateContent(t *testing.T) {
 		testName      string
 		url           string
 		body          string
-		memoryStorage *memory.MemoryStorage
+		memoryStorage *memory.Storage
 		expectedErr   error
 	}
 
@@ -172,7 +172,7 @@ func TestMemoryStorage_GetContent(t *testing.T) {
 		testName      string
 		url           string
 		body          string
-		memoryStorage *memory.MemoryStorage
+		memoryStorage *memory.Storage
 		expectedErr   error
 	}
 
@@ -225,7 +225,7 @@ func TestMemoryStorage_GetContent(t *testing.T) {
 func TestMemoryStorage_GetAllContent(t *testing.T) {
 	type testCase struct {
 		testName        string
-		memoryStorage   *memory.MemoryStorage
+		memoryStorage   *memory.Storage
 		expectedContent map[string]string
 	}
 
@@ -238,7 +238,7 @@ func TestMemoryStorage_GetAllContent(t *testing.T) {
 	testCases := []testCase{
 		{
 			testName:        "get_all_content_works_in_empty_storage",
-			memoryStorage:   memory.NewMemoryStorage(),
+			memoryStorage:   memory.NewStorage(),
 			expectedContent: map[string]string{},
 		},
 		{
@@ -274,7 +274,7 @@ func TestMemoryStorage_IsRepeatedContent(t *testing.T) {
 		testName      string
 		url           string
 		body          string
-		memoryStorage *memory.MemoryStorage
+		memoryStorage *memory.Storage
 		expected      bool
 	}
 
@@ -289,7 +289,7 @@ func TestMemoryStorage_IsRepeatedContent(t *testing.T) {
 			testName:      "new_content_in_empty_storage_is_not_repeated",
 			url:           "http://new-url.com",
 			body:          "new content",
-			memoryStorage: memory.NewMemoryStorage(),
+			memoryStorage: memory.NewStorage(),
 			expected:      false,
 		},
 		{
