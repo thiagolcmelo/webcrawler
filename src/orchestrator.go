@@ -66,7 +66,7 @@ func (o *Orchestrator) Start(seed string) {
 		go func(i int) {
 			for {
 				select {
-				case url := <-o.frontier.Pop():
+				case url := <-o.frontier.Consume():
 					go o.processUrl(url)
 				case <-o.ctx.Done():
 					return
@@ -74,9 +74,9 @@ func (o *Orchestrator) Start(seed string) {
 			}
 		}(i)
 	}
-	o.frontier.Push(seed)
 	// wg is decremented when processUrl finishes
 	o.wg.Add(1)
+	o.frontier.Publish(seed)
 
 	// wait for downloads complete or context to be canceled
 	c := make(chan struct{})

@@ -27,7 +27,7 @@ func (bd *BasicDispatcher) DispatchNewUrls(urls []string) (int, error) {
 	}
 
 	for _, url := range newUrls {
-		bd.frontier.Push(url)
+		bd.frontier.Publish(url)
 	}
 
 	return len(newUrls), nil

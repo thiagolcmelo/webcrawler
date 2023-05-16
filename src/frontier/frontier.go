@@ -1,6 +1,6 @@
 package frontier
 
 type Frontier interface {
-	Push(string) error
-	Pop() <-chan string
+	Publish(string) error
+	Consume() <-chan string
 }

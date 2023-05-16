@@ -15,12 +15,12 @@ type fakeFrontier struct {
 	Items []string
 }
 
-func (ff *fakeFrontier) Push(url string) error {
+func (ff *fakeFrontier) Publish(url string) error {
 	ff.Items = append(ff.Items, url)
 	return nil
 }
 
-func (ff *fakeFrontier) Pop() <-chan string {
+func (ff *fakeFrontier) Consume() <-chan string {
 	return make(<-chan string)
 }
 

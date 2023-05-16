@@ -10,11 +10,11 @@ func NewMemoryFrontier() *MemoryFrontier {
 	}
 }
 
-func (mf *MemoryFrontier) Push(address string) error {
+func (mf *MemoryFrontier) Publish(address string) error {
 	mf.jobs <- address
 	return nil
 }
 
-func (mf *MemoryFrontier) Pop() <-chan string {
+func (mf *MemoryFrontier) Consume() <-chan string {
 	return mf.jobs
 }

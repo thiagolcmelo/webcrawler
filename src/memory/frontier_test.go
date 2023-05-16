@@ -16,7 +16,7 @@ func TestMemoryFrontier_Push(t *testing.T) {
 	go func() {
 		for {
 			select {
-			case val := <-mf.Pop():
+			case val := <-mf.Consume():
 				if val != "value" {
 					t.Errorf("unexpected value %s", val)
 				}
@@ -27,7 +27,7 @@ func TestMemoryFrontier_Push(t *testing.T) {
 		}
 	}()
 
-	mf.Push("value")
+	mf.Publish("value")
 }
 
 func TestMemoryFrontier_Pop(t *testing.T) {
@@ -41,7 +41,7 @@ func TestMemoryFrontier_Pop(t *testing.T) {
 
 		for {
 			select {
-			case val := <-mf.Pop():
+			case val := <-mf.Consume():
 				receivedValues[val] = true
 				everythingFound := true
 				for _, expected := range expectedValues {
@@ -59,7 +59,7 @@ func TestMemoryFrontier_Pop(t *testing.T) {
 		}
 	}()
 
-	mf.Push("value1")
-	mf.Push("value2")
-	mf.Push("value3")
+	mf.Publish("value1")
+	mf.Publish("value2")
+	mf.Publish("value3")
 }
